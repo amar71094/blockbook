@@ -1,6 +1,6 @@
 module github.com/trezor/blockbook
 
-go 1.23.0
+go 1.23
 
 require (
 	github.com/ava-labs/avalanchego v1.12.1

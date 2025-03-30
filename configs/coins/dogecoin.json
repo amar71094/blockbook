@@ -6,15 +6,15 @@
         "alias": "dogecoin"
     },
     "ports": {
-        "backend_rpc": 8038,
+        "backend_rpc": 22555,
         "backend_message_queue": 38338,
         "blockbook_internal": 9038,
         "blockbook_public": 9138
     },
     "ipc": {
         "rpc_url_template": "http://127.0.0.1:{{.Ports.BackendRPC}}",
-        "rpc_user": "rpc",
-        "rpc_pass": "rpcp",
+        "rpc_user": "tapondoge",
+        "rpc_pass": "Hondacbr400@",
         "rpc_timeout": 25,
         "message_queue_binding_template": "tcp://127.0.0.1:{{.Ports.BackendMessageQueue}}"
     },
@@ -57,7 +57,7 @@
         "internal_binding_template": ":{{.Ports.BlockbookInternal}}",
         "public_binding_template": ":{{.Ports.BlockbookPublic}}",
         "explorer_url": "",
-        "additional_params": "-resyncindexperiod=30011 -resyncmempoolperiod=2011",
+        "additional_params": "-resyncindexperiod=86400 -resyncmempoolperiod=300",
         "block_chain": {
             "parse": true,
             "mempool_workers": 8,

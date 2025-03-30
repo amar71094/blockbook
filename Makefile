@@ -19,7 +19,7 @@ build-debug: .bin-image
 	docker run -t --rm -e PACKAGER=$(PACKAGER) -v "$(CURDIR):/src" -v "$(CURDIR)/build:/out" $(BIN_IMAGE) make build-debug ARGS="$(ARGS)"
 
 test: .bin-image
-	docker run -t --rm -e PACKAGER=$(PACKAGER) -v "$(CURDIR):/src" --network="host" $(BIN_IMAGE) make test ARGS="$(ARGS)"
+	docker run -t --rm -e PACKAGER=$(PACKAGER) -v "$(CURDIR):/src" --network="host" $(BIN_IMAGE) /bin/sh -c "cd /go/src/github.com/trezor/blockbook && go test -tags 'unittest' -timeout 30m `go list ./... | grep -vP '^github.com/trezor/blockbook/(contrib|tests)'`"
 
 test-integration: .bin-image
 	docker run -t --rm -e PACKAGER=$(PACKAGER) -v "$(CURDIR):/src" --network="host" $(BIN_IMAGE) make test-integration ARGS="$(ARGS)"
