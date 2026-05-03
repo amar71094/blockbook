@@ -191,7 +191,7 @@ like macOS or Windows, please adapt the instructions to your target system.
 Setup go environment (use newer version of go as available)
 
 ```
-wget https://golang.org/dl/go1.22.8.linux-amd64.tar.gz && tar xf go1.22.8.linux-amd64.tar.gz
+wget https://go.dev/dl/go1.23.12.linux-amd64.tar.gz && tar xf go1.23.12.linux-amd64.tar.gz
 sudo mv go /opt/go
 sudo ln -s /opt/go/bin/go /usr/bin/go
 # see `go help gopath` for details
@@ -225,6 +225,9 @@ Install ZeroMQ: https://github.com/zeromq/libzmq
 ```
 git clone https://github.com/zeromq/libzmq
 cd libzmq
+# build a specific release tag, and keep it aligned with your runtime host
+# prefer 4.3.5 because 4.3.4 fails to build with gcc-13+ (allocator rebind check)
+git checkout v4.3.5
 ./autogen.sh
 ./configure
 make
@@ -238,6 +241,47 @@ cd $GOPATH/src
 git clone https://github.com/trezor/blockbook.git
 cd blockbook
 go build
+```
+
+#### ZeroMQ version mismatch troubleshooting
+
+If Blockbook fails with message like:
+
+`zmq4 was installed with ZeroMQ version 4.3.4, but the application links with version 4.3.5`
+
+then Go module `github.com/pebbe/zmq4` was compiled against a different `libzmq` than the one loaded at runtime.
+
+Verify the versions:
+
+```
+pkg-config --modversion libzmq
+ldd ./blockbook | grep libzmq
+```
+
+If they differ, install the intended `libzmq` version and rebuild Blockbook so `zmq4` is recompiled:
+
+```
+go clean -cache
+go build -a
+```
+
+If you build via repository `Makefile`, note it compiles in Docker. The container and host
+must use the same `libzmq` version, otherwise runtime can fail with the same mismatch.
+Check which binary is running and what it links to:
+
+```
+readlink -f /proc/<blockbook-pid>/exe
+ldd /proc/<blockbook-pid>/exe | grep libzmq
+```
+
+If you must stay on `libzmq v4.3.4` with newer GCC, backport upstream fixes:
+
+```
+git cherry-pick 176d72cc9b3bdcc416fd11dbc82e7b386dda32b7
+git cherry-pick 92b2c38a2c51a1942a380c7ee08147f7b1ca6845
+git cherry-pick 438d5d88392baffa6c2c5e0737d9de19d6686f0d
+make -j"$(nproc)"
+sudo make install
 ```
 
 ### Example command
